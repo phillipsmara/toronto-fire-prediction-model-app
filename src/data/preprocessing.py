@@ -38,14 +38,31 @@ def clean_data_stations(df: pd.DataFrame):
         'WARD_NAME',
         'TYPE_DESC',
         'YEAR_BUILD',
-        'FIRE_PREV_OFFICE',
         'geometry',
     ]
 
     df = df[columns_to_keep].copy()
     df = df.dropna(subset=['ADDRESS_NUMBER', 'LINEAR_NAME_FULL', 'STATION', 'geometry'])
 
-    df['YEAR_BUILD'] = pd.to_datetime(df['YEAR_BUILD'], errors='coerce')
+    text_cols = ['STATION', 'WARD_NAME', 'TYPE_DESC', 'ADDRESS', 'MUNICIPALITY_NAME']
+
+    for col in text_cols:
+        if col in df.columns:
+            df[col] = (
+                df[col]
+                .astype(str)
+                .str.strip()
+                .str.upper()
+            )
+
+    if 'YEAR_BUILD' in df.columns:
+        df['YEAR_BUILD'] = pd.to_numeric(df['YEAR_BUILD'], errors='coerce')
+
+        # Remove unrealistic build years
+        df = df[
+            (df['YEAR_BUILD'].isna()) |
+            ((df['YEAR_BUILD'] > 1800) & (df['YEAR_BUILD'] <= pd.Timestamp.today().year))
+        ]
 
     df = df.reset_index(drop=True)
 
