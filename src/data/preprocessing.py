@@ -219,7 +219,3 @@ def clean_data_incidents():
 
     print(combined_df.head())
     return combined_df
-
-
-
-clean_data_incidents()
