@@ -1,5 +1,6 @@
 # Preprocesses data
 import pandas as pd
+import glob
 
 def load_raw_data(file_path):
     df = pd.read_csv(file_path)
@@ -129,10 +130,96 @@ def clean_data_hydrants(df: pd.DataFrame):
     print(df)
     return df
 
-def clean_data_incidents(df: pd.DataFrame):
+def clean_data_incidents():
+    # Find all incident files
+    path_pattern = "data/raw/basic-incidents-details-*.csv"
+    files = glob.glob(path_pattern)
+    df_list = []
 
-    return df
+    # Combine all incident files into one data frame
+    for file in files:
+        temp_df = pd.read_csv(file)
+        df_list.append(temp_df)
 
-df = load_raw_data("data/raw/fire-hydrants-data-4326.csv")
+    combined_df = pd.concat(df_list, ignore_index=True)
 
-clean_data_hydrants(df)
+    # Standardize column names
+    combined_df.columns = combined_df.columns.str.strip().str.upper()
+
+    # Select relevant columns
+    columns_to_keep = [
+        'INCIDENT_NUMBER',
+        'INITIAL_CAD_EVENT_TYPE',
+        'INITIAL_CAD_EVENT_CALL_TYPE',
+        'FINAL_INCIDENT_TYPE',
+        'EVENT_ALARM_LEVEL',
+        'CALL_SOURCE',
+        'INCIDENT_STATION_AREA',
+        'INCIDENT_WARD',
+        'WARD_AT_EVENT_DISPATCH',
+        'INTERSECTION',
+        'TFS_ALARM_TIME',
+        'TFS_ARRIVAL_TIME',
+        'LAST_TFS_UNIT_CLEAR_TIME',
+        'PERSONS_RESCUED',
+        'GEOMETRY'
+    ]
+
+    combined_df = combined_df[[col for col in columns_to_keep if col in combined_df.columns]].copy()
+
+    # Remove duplicate incidents
+    combined_df = combined_df.drop_duplicates(subset=['INCIDENT_NUMBER'])
+
+    # Convert datetime columns
+    combined_df['TFS_ALARM_TIME'] = pd.to_datetime(combined_df['TFS_ALARM_TIME'], errors='coerce')
+    combined_df['TFS_ARRIVAL_TIME'] = pd.to_datetime(combined_df['TFS_ARRIVAL_TIME'], errors='coerce')
+    combined_df['LAST_TFS_UNIT_CLEAR_TIME'] = pd.to_datetime(combined_df['LAST_TFS_UNIT_CLEAR_TIME'], errors='coerce')
+
+    combined_df = combined_df.dropna(subset=['TFS_ALARM_TIME', 'TFS_ARRIVAL_TIME'])
+
+    # Create response time feature
+    combined_df['RESPONSE_TIME_MINUTES'] = (
+        (combined_df['TFS_ARRIVAL_TIME'] - combined_df['TFS_ALARM_TIME'])
+        .dt.total_seconds() / 60
+    )
+
+    combined_df = combined_df[
+        (combined_df['RESPONSE_TIME_MINUTES'] >= 0) &
+        (combined_df['RESPONSE_TIME_MINUTES'] <= 120)
+    ]
+
+    # Temporal features
+    combined_df['HOUR'] = combined_df['TFS_ALARM_TIME'].dt.hour
+    combined_df['DAY_OF_WEEK'] = combined_df['TFS_ALARM_TIME'].dt.dayofweek
+    combined_df['MONTH'] = combined_df['TFS_ALARM_TIME'].dt.month
+    combined_df['YEAR'] = combined_df['TFS_ALARM_TIME'].dt.year
+
+    # Clean categorical columns
+    categorical_cols = [
+        'INITIAL_CAD_EVENT_TYPE',
+        'INITIAL_CAD_EVENT_CALL_TYPE',
+        'FINAL_INCIDENT_TYPE',
+        'CALL_SOURCE',
+        'INTERSECTION'
+    ]
+
+    for col in categorical_cols:
+        if col in combined_df.columns:
+            combined_df[col] = combined_df[col].astype(str).str.strip().str.upper()
+
+    # Clean numeric column
+    if 'PERSONS_RESCUED' in combined_df.columns:
+        combined_df['PERSONS_RESCUED'] = pd.to_numeric(
+            combined_df['PERSONS_RESCUED'], errors='coerce'
+        ).fillna(0)
+
+    combined_df = combined_df.dropna(subset=['GEOMETRY'])
+
+    combined_df = combined_df.reset_index(drop=True)
+
+    print(combined_df.head())
+    return combined_df
+
+
+
+clean_data_incidents()
