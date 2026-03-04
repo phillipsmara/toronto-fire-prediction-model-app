@@ -3,7 +3,7 @@ import pandas as pd
 import glob
 
 def load_raw_data(file_path):
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_path, low_memory=False)
     return df
 
 def clean_data_run_areas(df: pd.DataFrame):
@@ -17,14 +17,14 @@ def clean_data_run_areas(df: pd.DataFrame):
         'RUN_AREA',
         'AREA_TYPE',
         'DATE_EFFECTIVE',
-        'geometry'
+        'GEOMETRY'
     ]
 
     df = df[columns_to_keep].copy()
 
     # Remove Duplicates and Null Entries
     df = df.drop_duplicates(subset=['RUN_AREA'])
-    df = df.dropna(subset=['RUN_AREA', 'geometry'])
+    df = df.dropna(subset=['RUN_AREA', 'GEOMETRY'])
 
     # Format DATE_EFFECTIVE
     df['DATE_EFFECTIVE'] = pd.to_datetime(df['DATE_EFFECTIVE'], errors='coerce')
@@ -55,13 +55,13 @@ def clean_data_stations(df: pd.DataFrame):
         'WARD_NAME',
         'TYPE_DESC',
         'YEAR_BUILD',
-        'geometry',
+        'GEOMETRY',
     ]
 
     df = df[columns_to_keep].copy()
 
     # Drop Null Entries
-    df = df.dropna(subset=['ADDRESS_NUMBER', 'LINEAR_NAME_FULL', 'STATION', 'geometry'])
+    df = df.dropna(subset=['ADDRESS_NUMBER', 'LINEAR_NAME_FULL', 'STATION', 'GEOMETRY'])
 
     # Format Text Columns
     text_cols = ['STATION', 'WARD_NAME', 'TYPE_DESC', 'ADDRESS', 'MUNICIPALITY_NAME']
@@ -127,7 +127,9 @@ def clean_data_hydrants(df: pd.DataFrame):
     df = df.drop_duplicates(subset=['FACILITYID'])
 
     df = df.reset_index(drop=True)
-    print(df)
+
+    print("fire_hydrants data cleaned successfully")
+
     return df
 
 def clean_data_incidents():
@@ -138,7 +140,7 @@ def clean_data_incidents():
 
     # Combine all incident files into one data frame
     for file in files:
-        temp_df = pd.read_csv(file)
+        temp_df = pd.read_csv(file, low_memory=False)
         df_list.append(temp_df)
 
     combined_df = pd.concat(df_list, ignore_index=True)
@@ -217,5 +219,6 @@ def clean_data_incidents():
 
     combined_df = combined_df.reset_index(drop=True)
 
-    print(combined_df.head())
+    print("incidents data cleaned successfully")
+
     return combined_df

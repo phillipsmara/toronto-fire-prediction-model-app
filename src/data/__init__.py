@@ -6,15 +6,19 @@ from .loader import (
 )
 
 from .preprocessing import (
-    load_raw_data,
     clean_data_run_areas,
     clean_data_stations,
     clean_data_hydrants,
     clean_data_incidents,
+    load_raw_data
 )
 
 from .api_client import (
     download_csv
+)
+
+from .features import (
+    generate_features
 )
 
 __all__ = [

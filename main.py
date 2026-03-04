@@ -1,7 +1,6 @@
-from src.data.loader import download_raw_data
-from src.data.api_client import download_csv
+from src.pipeline import run_pipeline
 
 def main():
-    download_raw_data()
+    run_pipeline()
 if __name__ == "__main__":
     main()
