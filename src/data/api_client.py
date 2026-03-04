@@ -1,5 +1,4 @@
 # Downloads raw data from City of Toronto Open Data using their API
-
 import requests
 import os
 
