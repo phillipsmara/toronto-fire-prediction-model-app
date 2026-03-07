@@ -18,7 +18,7 @@ from .api_client import (
 )
 
 from .features import (
-    generate_features
+    build_training_dataset
 )
 
 __all__ = [
@@ -37,4 +37,7 @@ __all__ = [
 
     # API
     "download_csv",
+
+    # Features
+    "build_training_dataset"
 ]

@@ -7,7 +7,7 @@ from src.data import clean_data_run_areas
 from src.data import clean_data_stations
 from src.data import clean_data_hydrants
 from src.data import clean_data_incidents
-from src.data import generate_features
+from src.data import build_training_dataset
 
 import os
 
@@ -33,3 +33,17 @@ def run_pipeline():
     incidents_df = clean_data_incidents()
     hydrants_df = clean_data_hydrants(fire_hydrants)
     stations_df = clean_data_stations(fire_stations)
+
+    training_df = build_training_dataset(
+    incidents_df,
+    run_areas_df,
+    hydrants_df,
+    stations_df
+    )
+
+    training_df.to_csv(
+    "data/processed/training_dataset.csv",
+    index=False
+    )
+
+    print("complete")
