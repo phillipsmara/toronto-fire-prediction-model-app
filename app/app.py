@@ -17,6 +17,21 @@ from src.config import (
 
 st.set_page_config(page_title=APP_TITLE, page_icon=APP_ICON, layout=APP_LAYOUT)
 
+# ── DEBUG (remove once model loading is confirmed working) ──────────────────
+st.write("**DEBUG INFO**")
+st.write("CWD:", os.getcwd())
+st.write("ROOT:", ROOT)
+st.write("MODEL_PATH:", MODEL_PATH)
+st.write("Model exists:", os.path.exists(MODEL_PATH))
+st.write("Scaler exists:", os.path.exists(SCALER_PATH))
+st.write("Feature list exists:", os.path.exists(FEATURE_LIST_PATH))
+try:
+    st.write("models/ contents:", os.listdir(os.path.join(ROOT, "models")))
+except Exception as e:
+    st.write("Could not list models/ dir:", e)
+st.markdown("---")
+# ── END DEBUG ───────────────────────────────────────────────────────────────
+
 @st.cache_resource(show_spinner="Loading model…")
 def load_model():
     import joblib
