@@ -1,6 +1,6 @@
-# =========================
+
 # Data files (too large for GitHub)
-# =========================
+
 data/raw/*.csv
 data/processed/*.csv
 
@@ -8,9 +8,9 @@ data/processed/*.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
-# =========================
+
 # Python
-# =========================
+
 __pycache__/
 *.py[cod]
 *$py.class
@@ -21,14 +21,14 @@ __pycache__/
 env/
 venv/
 
-# =========================
+
 # VS Code
-# =========================
+
 .vscode/
 
-# =========================
+
 # OS
-# =========================
+
 .DS_Store
 Thumbs.db
 
