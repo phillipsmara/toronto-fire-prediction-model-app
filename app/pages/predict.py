@@ -23,28 +23,35 @@ def _load_artefacts():
 
 def _build_input_row(hour, day_of_week, month, is_weekend, incident_type, call_source,
                      alarm_level, ward, station_area, dist_station_m, hydrants_500m, feature_cols):
-    row = {col: 0.0 for col in feature_cols}
-    row["hour_of_day"]            = float(hour)
-    row["day_of_week"]            = float(day_of_week)
-    row["month"]                  = float(month)
-    row["is_weekend"]             = float(is_weekend)
-    row["dist_nearest_station_m"] = float(dist_station_m)
-    row["hydrants_within_500m"]   = float(hydrants_500m)
+    # Start with a zero series indexed exactly by feature_cols
+    row = pd.Series(0.0, index=feature_cols)
+
+    def _set(col, val):
+        if col in row.index:
+            row[col] = float(val)
+
+    _set("hour_of_day", hour)
+    _set("day_of_week", day_of_week)
+    _set("month", month)
+    _set("is_weekend", is_weekend)
+    _set("dist_nearest_station_m", dist_station_m)
+    _set("hydrants_within_500m", hydrants_500m)
+
     try:
-        row["INCIDENT_WARD"]         = float(ward)
-        row["INCIDENT_STATION_AREA"] = float(station_area)
+        _set("INCIDENT_WARD", float(ward))
+        _set("INCIDENT_STATION_AREA", float(station_area))
     except ValueError:
         pass
 
     def _set_ohe(prefix, value):
         col = f"{prefix}_{value.upper().replace(' ', '_').replace('-', '_')}"
-        if col in row:
-            row[col] = 1.0
+        _set(col, 1.0)
 
     _set_ohe("FINAL_INCIDENT_TYPE", incident_type)
     _set_ohe("CALL_SOURCE", call_source)
     _set_ohe("EVENT_ALARM_LEVEL", alarm_level)
-    return np.array([list(row.values())], dtype=np.float32)
+
+    return row.values.reshape(1, -1).astype(np.float32)
 
 def render_predict():
     st.title("🔮 Predict Response Time")
