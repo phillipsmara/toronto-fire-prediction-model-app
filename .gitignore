@@ -9,15 +9,6 @@ data/processed/*.csv
 !data/processed/.gitkeep
 
 # =========================
-# Model artefacts (large binary files)
-# =========================
-models/*.joblib
-models/explainability/
-
-# Keep folder structure
-!models/.gitkeep
-
-# =========================
 # Python
 # =========================
 __pycache__/
