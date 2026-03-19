@@ -33,4 +33,5 @@ venv/
 Thumbs.db
 
 # Allow model artifacts
-!models/*.joblib
+!models/
+!models/*
