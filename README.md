@@ -12,14 +12,14 @@ This project uses over a decade of Toronto Fire Services incident data (2012–2
 
 ---
 
-## Features
+## Features 
 
 - Predicts fire response time in minutes and seconds
 - Benchmarks prediction against Toronto's 4-minute response target
 - Trained on 10+ years of real Toronto Fire Services open data
 - Spatial features including distance to nearest fire station and hydrant density
 - Temporal features including hour of day, day of week, and month
-- Covers 130+ incident types across the full CAD event taxonomy
+- Covers 130+ incident types
 
 ---
 
@@ -75,18 +75,4 @@ importance plots
 (gitignored)
 ├── main.py                    
 └── requirements.txt
-```
-
-## Requirements
-
-```
-pandas>=2.0.0
-numpy>=1.26.0
-scikit-learn>=1.4.0
-xgboost>=2.0.0
-shap>=0.44.0
-matplotlib>=3.8.0
-joblib>=1.3.0
-requests>=2.31.0
-streamlit
 ```
