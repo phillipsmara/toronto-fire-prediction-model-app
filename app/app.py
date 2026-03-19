@@ -1,14 +1,21 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
+os.chdir(ROOT)
 
 import json
 import numpy as np
+import pandas as pd
 import streamlit as st
-from src.config import MODEL_PATH, SCALER_PATH, FEATURE_LIST_PATH, INCIDENT_TYPES, CALL_SOURCES, ALARM_LEVELS, TORONTO_WARDS, STATION_AREAS
+from src.config import (
+    MODEL_PATH, SCALER_PATH, FEATURE_LIST_PATH,
+    INCIDENT_TYPES, CALL_SOURCES, ALARM_LEVELS,
+    TORONTO_WARDS, STATION_AREAS, APP_TITLE, APP_ICON, APP_LAYOUT,
+)
 
-st.set_page_config(page_title="Toronto Fire Response Time Predictor", page_icon="🚒", layout="centered")
+st.set_page_config(page_title=APP_TITLE, page_icon=APP_ICON, layout=APP_LAYOUT)
 
 @st.cache_resource(show_spinner="Loading model…")
 def load_model():
@@ -20,8 +27,6 @@ def load_model():
     with open(FEATURE_LIST_PATH) as f:
         feature_cols = json.load(f)
     return model, scaler, feature_cols
-
-import pandas as pd
 
 def build_input(hour, day_of_week, month, is_weekend, incident_type, call_source,
                 alarm_level, ward, station_area, dist_station_m, hydrants_500m, feature_cols):
@@ -55,7 +60,7 @@ def build_input(hour, day_of_week, month, is_weekend, incident_type, call_source
 
 model, scaler, feature_cols = load_model()
 
-st.title("🚒 Toronto Fire Response Time Predictor")
+st.title(f"{APP_ICON} {APP_TITLE}")
 st.markdown("---")
 
 if model is None:
@@ -101,8 +106,8 @@ if st.button("⚡ Predict Response Time", type="primary", use_container_width=Tr
     if pred_min <= 4:
         st.success("🟢 Within the 4-minute target")
     elif pred_min <= 6:
-        st.warning("🟡 Slightly above Toronto fire response goal of 4 minutes")
+        st.warning("🟡 Slightly above target")
     elif pred_min <= 10:
-        st.warning("🟠 Moderately above Toronto fire response goal of 4 minutes")
+        st.warning("🟠 Moderately above target")
     else:
-        st.error("🔴 Significantly above Toronto fire response goal of 4 minutes")
+        st.error("🔴 Significantly above target")
