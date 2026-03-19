@@ -1,0 +1,42 @@
+# =========================
+# Data files (too large for GitHub)
+# =========================
+data/raw/*.csv
+data/processed/*.csv
+
+# Keep folder structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# =========================
+# Model artefacts (large binary files)
+# =========================
+models/*.joblib
+models/explainability/
+
+# Keep folder structure
+!models/.gitkeep
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+env/
+venv/
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
