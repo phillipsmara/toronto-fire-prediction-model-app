@@ -101,8 +101,8 @@ if st.button("⚡ Predict Response Time", type="primary", use_container_width=Tr
     if pred_min <= 4:
         st.success("🟢 Within the 4-minute target")
     elif pred_min <= 6:
-        st.warning("🟡 Slightly above target")
+        st.warning("🟡 Slightly above Toronto fire response goal of 4 minutes")
     elif pred_min <= 10:
-        st.warning("🟠 Moderately above target")
+        st.warning("🟠 Moderately above Toronto fire response goal of 4 minutes")
     else:
-        st.error("🔴 Significantly above target")
+        st.error("🔴 Significantly above Toronto fire response goal of 4 minutes")
