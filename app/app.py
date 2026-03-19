@@ -1,36 +1,14 @@
 import sys
 import os
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, ROOT)
-os.chdir(ROOT)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import json
 import numpy as np
-import pandas as pd
 import streamlit as st
-from src.config import (
-    MODEL_PATH, SCALER_PATH, FEATURE_LIST_PATH,
-    INCIDENT_TYPES, CALL_SOURCES, ALARM_LEVELS,
-    TORONTO_WARDS, STATION_AREAS, APP_TITLE, APP_ICON, APP_LAYOUT,
-)
+from src.config import MODEL_PATH, SCALER_PATH, FEATURE_LIST_PATH, INCIDENT_TYPES, CALL_SOURCES, ALARM_LEVELS, TORONTO_WARDS, STATION_AREAS
 
-st.set_page_config(page_title=APP_TITLE, page_icon=APP_ICON, layout=APP_LAYOUT)
-
-# ── DEBUG (remove once model loading is confirmed working) ──────────────────
-st.write("**DEBUG INFO**")
-st.write("CWD:", os.getcwd())
-st.write("ROOT:", ROOT)
-st.write("MODEL_PATH:", MODEL_PATH)
-st.write("Model exists:", os.path.exists(MODEL_PATH))
-st.write("Scaler exists:", os.path.exists(SCALER_PATH))
-st.write("Feature list exists:", os.path.exists(FEATURE_LIST_PATH))
-try:
-    st.write("models/ contents:", os.listdir(os.path.join(ROOT, "models")))
-except Exception as e:
-    st.write("Could not list models/ dir:", e)
-st.markdown("---")
-# ── END DEBUG ───────────────────────────────────────────────────────────────
+st.set_page_config(page_title="Toronto Fire Response Time Predictor", page_icon="🚒", layout="centered")
 
 @st.cache_resource(show_spinner="Loading model…")
 def load_model():
@@ -42,6 +20,8 @@ def load_model():
     with open(FEATURE_LIST_PATH) as f:
         feature_cols = json.load(f)
     return model, scaler, feature_cols
+
+import pandas as pd
 
 def build_input(hour, day_of_week, month, is_weekend, incident_type, call_source,
                 alarm_level, ward, station_area, dist_station_m, hydrants_500m, feature_cols):
@@ -75,7 +55,7 @@ def build_input(hour, day_of_week, month, is_weekend, incident_type, call_source
 
 model, scaler, feature_cols = load_model()
 
-st.title(f"{APP_ICON} {APP_TITLE}")
+st.title("🚒 Toronto Fire Response Time Predictor")
 st.markdown("---")
 
 if model is None:
@@ -121,8 +101,8 @@ if st.button("⚡ Predict Response Time", type="primary", use_container_width=Tr
     if pred_min <= 4:
         st.success("🟢 Within the 4-minute target")
     elif pred_min <= 6:
-        st.warning("🟡 Slightly above target")
+        st.warning("🟡 Slightly above Toronto fire response goal of 4 minutes")
     elif pred_min <= 10:
-        st.warning("🟠 Moderately above target")
+        st.warning("🟠 Moderately above Toronto fire response goal of 4 minutes")
     else:
-        st.error("🔴 Significantly above target")
+        st.error("🔴 Significantly above Toronto fire response goal of 4 minutes")
